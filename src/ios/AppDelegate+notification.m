@@ -28,6 +28,10 @@ static char launchNotificationKey;
     original = class_getInstanceMethod(self, @selector(init));
     swizzled = class_getInstanceMethod(self, @selector(swizzled_init));
     method_exchangeImplementations(original, swizzled);
+
+    original = class_getInstanceMethod(self, @selector(applicationDidBecomeActive));
+    swizzled = class_getInstanceMethod(self, @selector(swizzled_applicationDidBecomeActive));
+    method_exchangeImplementations(original, swizzled);
 }
 
 - (AppDelegate *)swizzled_init
@@ -82,7 +86,7 @@ static char launchNotificationKey;
     }
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
+- (void)swizzled_applicationDidBecomeActive:(UIApplication *)application {
 
     NSLog(@"active");
 
@@ -101,6 +105,8 @@ static char launchNotificationKey;
         self.launchNotification = nil;
         [pushHandler performSelectorOnMainThread:@selector(notificationReceived) withObject:pushHandler waitUntilDone:NO];
     }
+
+    [self swizzled_applicationDidBecomeActive:application];
 }
 
 //For interactive notification only
